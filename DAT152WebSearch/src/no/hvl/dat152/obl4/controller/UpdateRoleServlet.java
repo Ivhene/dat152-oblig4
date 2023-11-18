@@ -32,6 +32,11 @@ public class UpdateRoleServlet extends HttpServlet {
 			HttpServletResponse response) throws ServletException, IOException {
 
 		request.removeAttribute("message");
+		
+		if (!request.getParameter("csrfToken").equals(request.getSession().getAttribute("csrfToken"))) {
+			request.getSession().invalidate();
+			response.sendRedirect("login");
+		}
 
 		boolean successfulRoleUpdate = false;
 		

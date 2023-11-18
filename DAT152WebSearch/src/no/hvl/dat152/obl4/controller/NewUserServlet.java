@@ -1,6 +1,9 @@
 package no.hvl.dat152.obl4.controller;
 
 import java.io.IOException;
+import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -49,7 +52,7 @@ public class NewUserServlet extends HttpServlet {
 				.getParameter("dicturl"));
 
 		AppUser user = null;
-		if (password.equals(confirmedPassword)) {
+		if (validatePassword(password, confirmedPassword)) {
 
 			AppUserDAO userDAO = new AppUserDAO();
 
@@ -61,6 +64,7 @@ public class NewUserServlet extends HttpServlet {
 
 		if (successfulRegistration) {
 			request.getSession().setAttribute("user", user);
+			request.getSession().setAttribute("csrfToken", UUID.randomUUID().toString());
 			Cookie dicturlCookie = new Cookie("dicturl", preferredDict);
 			dicturlCookie.setMaxAge(60*10);
 			response.addCookie(dicturlCookie);
@@ -73,5 +77,16 @@ public class NewUserServlet extends HttpServlet {
 					response);
 		}
 	}
+	
+	
+	 private boolean validatePassword(String password, String confirmedPassword) {
+	        String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{6,50}$";
+
+	        Pattern pattern = Pattern.compile(regex);
+
+	        Matcher matcher = pattern.matcher(password);
+
+	        return matcher.matches() && password.equals(confirmedPassword);
+	    }
 
 }

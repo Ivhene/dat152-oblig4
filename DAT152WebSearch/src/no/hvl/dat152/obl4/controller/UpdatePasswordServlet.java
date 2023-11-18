@@ -15,10 +15,10 @@ import no.hvl.dat152.obl4.util.Validator;
 public class UpdatePasswordServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-	protected void doGet(HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		// check that the user has a valid session
-		if(RequestHelper.isLoggedIn(request))
+		if (RequestHelper.isLoggedIn(request))
 			request.getRequestDispatcher("updatepassword.jsp").forward(request, response);
 		else {
 			request.setAttribute("message", "Session has expired. Login again!");
@@ -26,29 +26,31 @@ public class UpdatePasswordServlet extends HttpServlet {
 		}
 	}
 
-	protected void doPost(HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 
 		request.removeAttribute("message");
 
+		if (!request.getParameter("csrfToken").equals(request.getSession().getAttribute("csrfToken"))) {
+			request.getSession().invalidate();
+			response.sendRedirect("login");
+		}
+
 		boolean successfulPasswordUpdate = false;
-		
-		String passwordnew = Validator.validString(request
-				.getParameter("passwordnew"));
-		String confirmedPasswordnew = Validator.validString(request
-				.getParameter("confirm_passwordnew"));
-		
-		
+
+		String passwordnew = Validator.validString(request.getParameter("passwordnew"));
+		String confirmedPasswordnew = Validator.validString(request.getParameter("confirm_passwordnew"));
+
 		if (RequestHelper.isLoggedIn(request)) {
-			
+
 			AppUser user = (AppUser) request.getSession().getAttribute("user");
-			
+
 			AppUserDAO userDAO = new AppUserDAO();
-			
-			if (passwordnew.equals(confirmedPasswordnew)){
-				
+
+			if (passwordnew.equals(confirmedPasswordnew)) {
+
 				successfulPasswordUpdate = userDAO.updateUserPassword(user.getUsername(), passwordnew);
-				
+
 				if (successfulPasswordUpdate) {
 					request.getSession().invalidate(); // invalidate current session and force user to login again
 					request.setAttribute("message", "Password successfully updated. Please login again!");
@@ -56,19 +58,16 @@ public class UpdatePasswordServlet extends HttpServlet {
 
 				} else {
 					request.setAttribute("message", "Password update failed!");
-					request.getRequestDispatcher("updatepassword.jsp").forward(request,
-							response);
+					request.getRequestDispatcher("updatepassword.jsp").forward(request, response);
 				}
 			} else {
 				request.setAttribute("message", "Password fields do not match. Try again!");
-				request.getRequestDispatcher("updatepassword.jsp").forward(request,
-						response);
+				request.getRequestDispatcher("updatepassword.jsp").forward(request, response);
 			}
-			
+
 		} else {
 			request.getSession().invalidate();
-			request.getRequestDispatcher("index.html").forward(request,
-					response);
+			request.getRequestDispatcher("index.html").forward(request, response);
 		}
 
 	}

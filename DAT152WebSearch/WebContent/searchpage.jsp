@@ -19,10 +19,10 @@
 	<p><b>Last 5 searches done by anyone (Only visible to super Admins)</b></p>
 	<p>
 	<c:forEach varStatus="counter" var="searchItem" items="${top5history}">
-		<b>${counter.count}:</b> ${searchItem.datetime} 
+		<b><c:out value="${counter.count}"></c:out>:</b> <c:out value="${searchItem.datetime}"></c:out> 
 		<a href="dosearch?user=${user.username}&searchkey=${searchItem.searchkey}">
-		${searchItem.searchkey}</a><br>
+		<c:out value="${searchItem.searchkey}"></c:out></a><br>
 	</c:forEach><br>
-	<p><b>You are logged in as ${user.username}. <a href="logout">Log out</a></b></p>
+	<p><b>You are logged in as <c:out value="${user.username}"></c:out>. <a href="logout">Log out</a></b></p>
 </body>
 </html>

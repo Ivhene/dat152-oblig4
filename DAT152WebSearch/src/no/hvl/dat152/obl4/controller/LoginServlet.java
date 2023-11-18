@@ -2,6 +2,7 @@ package no.hvl.dat152.obl4.controller;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -57,6 +58,7 @@ public class LoginServlet extends HttpServlet {
 				successfulLogin = true;
 				request.getSession().setAttribute("user", authUser);
 				request.getSession().setAttribute("updaterole", "");
+				request.getSession().setAttribute("csrfToken", UUID.randomUUID().toString());
 				
 				// admin issues
 				if(authUser.getRole().equals(Role.ADMIN.name())) {
